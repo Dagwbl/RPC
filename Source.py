@@ -25,3 +25,6 @@ def Source():
         ['1600130046', '钱阳'], ['1600130048', '吴宇星']
         ]
     return list1,39
+
+if __name__ == "__main__":
+    Source()
