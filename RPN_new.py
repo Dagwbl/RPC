@@ -1,12 +1,21 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-import time
-from sys import exit
 import csv
+import shutil
+import time
 import tkinter as tk
-import RPN_function as f
+from sys import exit
 from tkinter import messagebox, ttk
+from tkinter.filedialog import askdirectory, asksaveasfilename
+
+import pywintypes
+import win32con
+
+import RPN_function as f
+import win32api
+
+# from pywintypes import 
 
 
 window = tk.Tk()
@@ -33,6 +42,20 @@ def About_info():
     \
     早
     ''')
+
+def printfile():
+            # defining options for opening a directory  
+        dir_opt = options = {}  
+        options['initialdir'] = 'D:\\'  
+        # options['mustexist'] = False  
+        options['parent'] = window  
+        options['title'] = '保存至' 
+        options['filetypes'] = [("txt文本",'*.txt'),('csv文件','*.csv')]
+        
+        filename = asksaveasfilename(**dir_opt)
+        try :shutil.copy(listfile3,filename)
+        except FileNotFoundError:
+            messagebox.showinfo('提示','还没有成绩信息')
 
 def score(stu_info):
     def write_score():
@@ -67,11 +90,12 @@ def yes_or_no(stu_info):
     else:
         with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
             writer = csv.writer(lf4)
-            reader = csv.reader(lf4)
+            # reader = csv.reader(lf4)
             writer.writerow(info)
             list4.append(info)
             list4s.set(list4[::-1])
             _list4.pack()
+
 def name():
     l_top.config(text='Click button Start random roll call')
     f.Named()
@@ -97,7 +121,6 @@ def Uncall_person():
             list0.append(row)
     str0 = 'All uncalled students are :\n'+str(list0)
     messagebox.showinfo('Uncall list', str0)
-
 
 def add_student():
     def add_student_to_database():
@@ -193,6 +216,7 @@ def add_studented():
                 list2s.set(list2[::-1])
                 _list2.pack()
                 _list1.place( )
+                yes_or_no(stu_info)
                 messagebox.showinfo('Tips', 'Add seccessfully!')
                 l_bottom.config(text =  'Surplus: '+str(surplus-1))
                 l_bottom.pack(side = 'bottom')
@@ -213,6 +237,23 @@ def add_studented():
     btn_comfirm_sign_up = tk.Button(add_window, text='Add', command=add_student_to_called)
     btn_comfirm_sign_up.place(x=150, y=130)
 
+def del_score(stu_info):
+        # score_ed = score_num.get()
+        info = stu_info
+        with open(listfile3,'r',encoding = 'utf-8',newline = '') as lf3:
+            writer = csv.writer(lf3)
+            reader = csv.reader(lf3)
+            list0 =[]
+            for row in reader:
+                if info[0] !=row[0]:pass
+                else : list0.append(row)
+        with open(listfile3,'w',encoding = 'utf-8',newline = '') as lf3:
+            writer = csv.writer(lf3)
+            for row in list0:
+                writer.writerow(row)
+        list3s.set(list0[::-1])
+
+
 def del_student_from_ed():
     def del_student_to_called():
         Student_id = stu_id.get()
@@ -231,7 +272,8 @@ def del_student_from_ed():
                 list1s.set(list1)
                 list2s.set(list2[::-1])
                 _list2.pack()
-                _list1.place( )
+                _list1.place()
+                del_score(stu_info)
                 messagebox.showinfo('Tips', 'Delete seccessfully!')
                 l_bottom.config(text =  'Surplus: '+str(surplus+1))
                 l_bottom.pack(side = 'bottom')
@@ -327,36 +369,50 @@ l_bottom.pack(side=tk.BOTTOM, expand=tk.YES, fill=tk.X)
 
 menubar = tk.Menu(window)
 filemenu = tk.Menu(menubar, tearoff=0)
-menubar.add_cascade(label='File', menu=filemenu)
-filemenu.add_command(label='Open', command=f.chooseFile)
-filemenu.add_command(label='Reset', command=f.reset_nd)
+menubar.add_cascade(label='文件', menu=filemenu)
+filemenu.add_command(label='打开', command=f.chooseFile)
+filemenu.add_command(label='重置', command=f.reset_nd)
 filemenu.add_separator()
-filemenu.add_command(label='Exit', command=window.quit)
+filemenu.add_command(label='退出', command=window.quit)
 
 printmenu = tk.Menu(menubar,tearoff = 0)
 menubar.add_cascade(label = '打印',menu = printmenu)
 printmenu.add_command(label = '打印成绩',command = print_score)
+printmenu.add_command(label = '打印到文件',command = printfile)
 
 inquiremenu = tk.Menu(menubar, tearoff=0)
-menubar.add_cascade(label='Inquire', menu=inquiremenu)
-inquiremenu.add_command(label='Uncall person', command=Uncall_person)
-inquiremenu.add_command(label='Students number', command=f.students_num)
-inquiremenu.add_command(label='Surplus number', command=f.surplus_num)
+menubar.add_cascade(label='查询', menu=inquiremenu)
+inquiremenu.add_command(label='未点人数', command=Uncall_person)
+inquiremenu.add_command(label='班级人数', command=f.students_num)
+inquiremenu.add_command(label='剩余人数', command=f.surplus_num)
 
 editmenu = tk.Menu(menubar, tearoff=0)
 submenu1 = tk.Menu(editmenu, tearoff=0)
 submenu2 = tk.Menu(editmenu, tearoff=0)
-menubar.add_cascade(label='Edit', menu=editmenu)
-editmenu.add_cascade(label='Add', menu=submenu1, underline=0)
-editmenu.add_cascade(label='Delete', menu=submenu2, underline=0)
+menubar.add_cascade(label='编辑', menu=editmenu)
+editmenu.add_cascade(label='添加', menu=submenu1, underline=0)
+editmenu.add_cascade(label='删除', menu=submenu2, underline=0)
 submenu1.add_command(
-    label='Add a student to database', command=add_student)
-submenu1.add_command(label='Add a student to named', command=add_studented)
+    label='添加到班级列表', command=add_student)
+submenu1.add_command(label='添加到已点列表', command=add_studented)
 submenu2.add_command(
-    label='Delete a student from database', command=del_studental)
-submenu2.add_command(label='Delete a student from named',
+    label='从班级中删除', command=del_studental)
+submenu2.add_command(label='从已点列表删除',
                     command=del_student_from_ed)
-menubar.add_command(label='About', command=About_info)
+menubar.add_command(label='关于', command=About_info)
 window.config(menu=menubar)
+
+win32api.SetFileAttributes(listfile1,win32con.FILE_ATTRIBUTE_HIDDEN)
+try :
+    win32api.SetFileAttributes(listfile2,win32con.FILE_ATTRIBUTE_HIDDEN)
+except pywintypes.error :
+    pass
+try:
+    win32api.SetFileAttributes(listfile3,win32con.FILE_ATTRIBUTE_HIDDEN)
+except pywintypes.error:pass
+try:
+    win32api.SetFileAttributes(listfile4,win32con.FILE_ATTRIBUTE_HIDDEN)
+except pywintypes.error :
+    pass
 
 window.mainloop()
