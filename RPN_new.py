@@ -21,8 +21,8 @@ import win32api
 
 window = tk.Tk()
 window.geometry('500x300')
-window.title('课堂点名')
-window.resizable(10, 10)
+window.title('课堂提问')
+window.resizable(1, 0)
 window.configure(bg='#9AC5EA')
 
 l_top = tk.Label(window, text='Less is more', bg='#22459E',
@@ -109,7 +109,7 @@ def name():
     # time.sleep(3)
     list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
     if surplus ==0 and len(list4)!=0:
-        messagebox.showinfo('提示','所有学生已经点完，且尚有回答错误的同学，请开始第二轮点名，将从回答错误的列表中抽取。如需强制忽略，可从菜单》文件》重置即可')
+        messagebox.showinfo('提示','所有学生已经点完，且尚有回答错误的同学，请开始第二轮提问，将从回答错误的列表中抽取。如需强制忽略，可从菜单》文件》重置即可')
     elif surplus ==0 and len(list4)==0:
         messagebox.showinfo('提示','所有学生已经点完，请备份好数据并重置')
     else:
@@ -131,7 +131,7 @@ def name2():
     # print(counter1,counter2,surplus)
     # print(list2)
     if len(list4) == 0:
-        messagebox.showinfo('Tips','尚未没有回答错误的学生，请先开始第一轮点名！')
+        messagebox.showinfo('Tips','尚未没有回答错误的学生，请先开始第一轮提问！')
         # if bool_1 == True:
         #     reset_nd()
         # else:
@@ -318,7 +318,7 @@ def del_student_from_ed():
         stu_info = [Student_id,nn]
         list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
         if stu_info not in list2:
-            messagebox.showerror('Error', "The user isn't exist!")
+            messagebox.showerror('Error', "学生信息不存在!")
         else:
             list2.remove(stu_info)
             os.remove(listfile2)
@@ -331,7 +331,7 @@ def del_student_from_ed():
                 _list2.pack()
                 # _list1.place()
             del_score(stu_info)
-            messagebox.showinfo('Tips', 'Delete seccessfully!')
+            messagebox.showinfo('Tips', '删除成功!')
             l_bottom.config(text =  'Surplus: '+str(surplus+1))
             l_bottom.pack(side = 'bottom')
             add_window.destroy()
@@ -371,14 +371,14 @@ page2 = tk.Frame(page)
 pagemid.configure(bg='#9AC5EA')
 page1.pack(side='left', expand=tk.YES, fill=tk.Y)
 page2.pack(side='right', expand=tk.YES, fill=tk.Y)
-pagemid.pack(side='bottom', expand=tk.YES, padx=1, ipady=50)
+pagemid.pack(side='bottom', expand=tk.YES, padx=1, ipady=41)
 page.pack(side='top')
 
 tk.Label(pagemid, text="", bg="#9AC5EA", font=(
     "Arial", 12), width=15, height=2).pack(side='top')
-n_button = tk.Button(pagemid, text='点名', width=4,
+n_button = tk.Button(pagemid, text='提问', width=4,
                     height=1, font=('Times 17 bold'), fg='#FFFFFF', bg='#0895A8', padx=12, command=name)
-n2_button = tk.Button(pagemid, text='二轮点名', width=6,
+n2_button = tk.Button(pagemid, text='补充提问', width=6,
 height=1, font=('Times 11 normal'), fg='#FFFFFF', bg='#6c8cd5', command=name2)
 n2_button.pack(side = 'bottom',fill = tk.X,pady = 1)
 n_button.pack(side='bottom',pady = 6)
@@ -463,17 +463,17 @@ submenu2.add_command(label='从已点列表删除',
 menubar.add_command(label='关于', command=About_info)
 window.config(menu=menubar)
 
-# win32api.SetFileAttributes(listfile1,win32con.FILE_ATTRIBUTE_HIDDEN)
-# try :
-#     win32api.SetFileAttributes(listfile2,win32con.FILE_ATTRIBUTE_HIDDEN)
-# except pywintypes.error :
-#     pass
-# try:
-#     win32api.SetFileAttributes(listfile3,win32con.FILE_ATTRIBUTE_HIDDEN)
-# except pywintypes.error:pass
-# try:
-#     win32api.SetFileAttributes(listfile4,win32con.FILE_ATTRIBUTE_HIDDEN)
-# except pywintypes.error :
-#     pass
+win32api.SetFileAttributes(listfile1,win32con.FILE_ATTRIBUTE_HIDDEN)
+try :
+    win32api.SetFileAttributes(listfile2,win32con.FILE_ATTRIBUTE_HIDDEN)
+except pywintypes.error :
+    pass
+try:
+    win32api.SetFileAttributes(listfile3,win32con.FILE_ATTRIBUTE_HIDDEN)
+except pywintypes.error:pass
+try:
+    win32api.SetFileAttributes(listfile4,win32con.FILE_ATTRIBUTE_HIDDEN)
+except pywintypes.error :
+    pass
 
 window.mainloop()
