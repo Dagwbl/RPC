@@ -17,12 +17,16 @@ listfile4 = 'list4.csv'
 def reset_nd():
     jud = messagebox.askyesno('Warning','将删除所有相关记录文件， 此操作不可逆，是否继续？')
     if jud:
+        try:os.remove(listfile1)
+        except FileNotFoundError:pass
+        try:os.remove(listfile2)
+        except FileNotFoundError:pass
         os.remove(listfile2)
         try:os.remove(listfile3)
         except FileNotFoundError:pass
         try:os.remove(listfile4)
         except FileNotFoundError:pass
-        messagebox.showinfo('Tips','删除成功，重启以开始新的记录')
+        messagebox.showinfo('Tips','重置成功，请关闭程序并重新启动.')
     else:
         pass
 
@@ -144,6 +148,7 @@ def chooseFile():
             except FileNotFoundError:pass
             try:os.remove(listfile4)
             except FileNotFoundError:pass
+            messagebox.showinfo('提示','数据配置完成，请关闭程序并重新启动！') 
             return True
     else :
         return False
@@ -187,3 +192,4 @@ def replacefile(filename):
     shutil.move(listfile1,'list1_old.csv')
     shutil.move(listfile2,'list2_old.csv')
     shutil.copy(filename,listfile1)
+    messagebox.showinfo('提示','替换完成，请关闭程序并重新启动！')
