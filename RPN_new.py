@@ -11,6 +11,7 @@ from tkinter.filedialog import askdirectory, asksaveasfilename
 
 import pywintypes
 import win32con
+import os
 
 import RPN_function as f
 import win32api
@@ -24,7 +25,7 @@ window.title('课堂点名')
 window.resizable(100, 100)
 window.configure(bg='#9AC5EA')
 
-l_top = tk.Label(window, text='文字显示区', bg='#22459E',
+l_top = tk.Label(window, text='Less is more', bg='#22459E',
                 fg='#FFFFFF', height=2, font=("Times 17 bold"))
 l_top.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
 
@@ -66,6 +67,7 @@ def score(stu_info):
             writer.writerow([info[0],info[1],str(score_ed)])
             list3.append([info[0],info[1],str(score_ed)])
             list3s.set(list3[::-1])
+            _list3.pack()
             score_window.destroy()
     score_window = tk.Toplevel(window)
     score_window.title('请评分')
@@ -97,17 +99,19 @@ def yes_or_no(stu_info):
             _list4.pack()
 
 def name():
-    l_top.config(text='Click button Start random roll call')
+    # l_top.config(text='Click button Start random roll call')
     f.Named()
     list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    l_top.config(text=list2[-1])
     yes_or_no(list2[-1])
+    
     l_bottom.config(text='Surplus: '+str(surplus))
     # if flag == False:
     list1s.set(list1)
     list2s.set(list2[::-1])
     _list2.pack()
     _list1.pack()
-    l_top.config(text=list2[-1])
+    # l_top.config(text=list2[-1])
     l_top.pack()
 
 
@@ -142,7 +146,7 @@ def add_student():
                 _list1.pack()
                 l_bottom.config(text='Surplus: '+str(surplus+1))
                 l_bottom.pack(side='bottom')
-                messagebox.showinfo('Tips', 'Add successfully!')
+                # messagebox.showinfo('Tips', 'Add successfully!')
                 add_window.destroy()
     add_window = tk.Toplevel(window)
     add_window.geometry('350x200')
@@ -212,12 +216,12 @@ def add_studented():
                 writer = csv.writer(class_list)
                 writer.writerow(stu_info)
                 list2.append(stu_info)
-                list1s.set(list1)
+                # list1s.set(list1)
                 list2s.set(list2[::-1])
                 _list2.pack()
-                _list1.place( )
+                # _list1.place( )
                 yes_or_no(stu_info)
-                messagebox.showinfo('Tips', 'Add seccessfully!')
+                # messagebox.showinfo('Tips', 'Add seccessfully!')
                 l_bottom.config(text =  'Surplus: '+str(surplus-1))
                 l_bottom.pack(side = 'bottom')
                 add_window.destroy()
@@ -240,18 +244,27 @@ def add_studented():
 def del_score(stu_info):
         # score_ed = score_num.get()
         info = stu_info
-        with open(listfile3,'r',encoding = 'utf-8',newline = '') as lf3:
-            writer = csv.writer(lf3)
-            reader = csv.reader(lf3)
-            list0 =[]
-            for row in reader:
-                if info[0] !=row[0]:pass
-                else : list0.append(row)
-        with open(listfile3,'w',encoding = 'utf-8',newline = '') as lf3:
-            writer = csv.writer(lf3)
-            for row in list0:
-                writer.writerow(row)
-        list3s.set(list0[::-1])
+        if info in list4:
+            list4.remove(info)
+            with open(listfile4,'w',encoding = 'utf-8',newline='')as lf4:
+                writer = csv.writer(lf4)
+                writer.writerows(list4)
+                list4s.set(list4)
+                _list4.pack()
+        else :
+            with open(listfile3,'r',encoding = 'utf-8',newline = '') as lf3:
+                # writer = csv.writer(lf3)
+                reader = csv.reader(lf3)
+                list0 =[]
+                for row in reader:
+                    if info[0] !=row[0]:pass
+                    else : list0.append(row)
+            with open(listfile3,'w',encoding = 'utf-8',newline = '') as lf3:
+                writer = csv.writer(lf3)
+                # for row in list0:
+                writer.writerows(list0)
+            list3s.set(list0[::-1])
+            _list3.pack()
 
 
 def del_student_from_ed():
@@ -262,22 +275,22 @@ def del_student_from_ed():
         list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
         if stu_info not in list2:
             messagebox.showerror('Error', "The user isn't exist!")
-            pass
         else:
             list2.remove(stu_info)
-            with open(listfile2, 'w',encoding = 'utf-8',newline='') as class_list:
-                writer = csv.writer(class_list)
-                for row in list2:
-                    writer.writerow(row)
-                list1s.set(list1)
+            os.remove(listfile2)
+            with open(listfile2, 'w',encoding = 'utf-8',newline='') as lf2:
+                writer = csv.writer(lf2)
+                # for row in list2:
+                writer.writerows(list2)
+                # list1s.set(list1)
                 list2s.set(list2[::-1])
                 _list2.pack()
-                _list1.place()
-                del_score(stu_info)
-                messagebox.showinfo('Tips', 'Delete seccessfully!')
-                l_bottom.config(text =  'Surplus: '+str(surplus+1))
-                l_bottom.pack(side = 'bottom')
-                add_window.destroy()
+                # _list1.place()
+            del_score(stu_info)
+            messagebox.showinfo('Tips', 'Delete seccessfully!')
+            l_bottom.config(text =  'Surplus: '+str(surplus+1))
+            l_bottom.pack(side = 'bottom')
+            add_window.destroy()
     add_window = tk.Toplevel(window)
     add_window.geometry('350x200')
     add_window.title('Delete student from called list')
@@ -402,17 +415,17 @@ submenu2.add_command(label='从已点列表删除',
 menubar.add_command(label='关于', command=About_info)
 window.config(menu=menubar)
 
-win32api.SetFileAttributes(listfile1,win32con.FILE_ATTRIBUTE_HIDDEN)
-try :
-    win32api.SetFileAttributes(listfile2,win32con.FILE_ATTRIBUTE_HIDDEN)
-except pywintypes.error :
-    pass
-try:
-    win32api.SetFileAttributes(listfile3,win32con.FILE_ATTRIBUTE_HIDDEN)
-except pywintypes.error:pass
-try:
-    win32api.SetFileAttributes(listfile4,win32con.FILE_ATTRIBUTE_HIDDEN)
-except pywintypes.error :
-    pass
+# win32api.SetFileAttributes(listfile1,win32con.FILE_ATTRIBUTE_HIDDEN)
+# try :
+#     win32api.SetFileAttributes(listfile2,win32con.FILE_ATTRIBUTE_HIDDEN)
+# except pywintypes.error :
+#     pass
+# try:
+#     win32api.SetFileAttributes(listfile3,win32con.FILE_ATTRIBUTE_HIDDEN)
+# except pywintypes.error:pass
+# try:
+#     win32api.SetFileAttributes(listfile4,win32con.FILE_ATTRIBUTE_HIDDEN)
+# except pywintypes.error :
+#     pass
 
 window.mainloop()
