@@ -22,7 +22,7 @@ def reset_nd():
         except FileNotFoundError:pass
         try:os.remove(listfile4)
         except FileNotFoundError:pass
-        messagebox.showinfo('Tips','删除成功，重启以开始新的记录')
+        messagebox.showinfo('Tips','删除成功，请关闭程序并重新启动.')
     else:
         pass
 
@@ -144,6 +144,7 @@ def chooseFile():
             except FileNotFoundError:pass
             try:os.remove(listfile4)
             except FileNotFoundError:pass
+            messagebox.showinfo('提示','数据配置完成，请关闭程序并重新启动！') 
             return True
     else :
         return False
@@ -187,3 +188,4 @@ def replacefile(filename):
     shutil.move(listfile1,'list1_old.csv')
     shutil.move(listfile2,'list2_old.csv')
     shutil.copy(filename,listfile1)
+    messagebox.showinfo('提示','替换完成，请关闭程序并重新启动！')
