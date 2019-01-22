@@ -17,12 +17,16 @@ listfile4 = 'list4.csv'
 def reset_nd():
     jud = messagebox.askyesno('Warning','将删除所有相关记录文件， 此操作不可逆，是否继续？')
     if jud:
+        try:os.remove(listfile1)
+        except FileNotFoundError:pass
+        try:os.remove(listfile2)
+        except FileNotFoundError:pass
         os.remove(listfile2)
         try:os.remove(listfile3)
         except FileNotFoundError:pass
         try:os.remove(listfile4)
         except FileNotFoundError:pass
-        messagebox.showinfo('Tips','删除成功，请关闭程序并重新启动.')
+        messagebox.showinfo('Tips','重置成功，请关闭程序并重新启动.')
     else:
         pass
 
