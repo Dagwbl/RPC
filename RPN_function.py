@@ -15,10 +15,14 @@ listfile3 = 'list3.csv'
 listfile4 = 'list4.csv'
 
 def reset_nd():
-    jud = messagebox.askyesno('Warning','Are you sure reset named file? This operation is irreversible.')
+    jud = messagebox.askyesno('Warning','将删除所有相关记录文件， 此操作不可逆，是否继续？')
     if jud:
         os.remove(listfile2)
-        messagebox.showinfo('Tips','The file has been reset, now you can begin a new lap.')
+        try:os.remove(listfile3)
+        except FileNotFoundError:pass
+        try:os.remove(listfile4)
+        except FileNotFoundError:pass
+        messagebox.showinfo('Tips','删除成功，重启以开始新的记录')
     else:
         pass
 
@@ -58,11 +62,12 @@ def inquire_ed():
                     counter1+=1
                     list1.append(j)
     except FileNotFoundError:
-        mes = messagebox.askquestion('Tips','No data files were found\nWhether to use default data (Safety Engineering 161)\n \
-click No to set base data.(*csvfile) \n \
-example  \n\
-123456,李红  \n\
-456789,李明')
+        mes = messagebox.askquestion('Tips','未发现本地配置文件\n是否使用默认数据 (安全工程161班)\n \
+点击“否”可选择数据文件.(csv格式) \n \
+例如  \n\n\
+1600000,沸羊羊  \n\
+1600001,喜羊羊  \n\
+1600002,美羊羊')
         if mes =='yes':
             counter1 = 0
             try:
@@ -76,7 +81,7 @@ example  \n\
                 writer = csv.writer(students)
                 list1,counter1= Source()[::]
                 for j in list1:
-                    print(j)
+                    # print(j)
                     if j:
                         writer.writerow(j)
                 else :
@@ -123,7 +128,7 @@ def chooseFile():
     filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
     if filename != '':
         # lb.config(text = 'The file you choose is '+ filename)
-        surefile = messagebox.askyesno('Tips','Are you sure select this file replace the current one? This operation is irreversible.')
+        surefile = messagebox.askyesno('Tips','确定选择此文件吗？将覆盖之前的所有数据')
         if surefile == True:
             try:
                 os.rename(listfile1,'.list1.bak')
@@ -133,6 +138,12 @@ def chooseFile():
                 shutil.copy(filename,listfile1)
             except FileNotFoundError:
                 shutil.copy(filename,listfile1)
+            try:os.remove(listfile2)
+            except FileNotFoundError:pass
+            try:os.remove(listfile3)
+            except FileNotFoundError:pass
+            try:os.remove(listfile4)
+            except FileNotFoundError:pass
             return True
     else :
         return False
@@ -151,8 +162,8 @@ def Named():
     list1,list2,list3,list4,counter1,counter2,surplus = inquire_ed()
     print(counter1,counter2,surplus)
     # print(list2)
-    if surplus == 0:
-        bool_1 = messagebox.askyesno('Tips','Everyone has been called.\nDo you want to reset data?(y/n)')
+    if surplus == 0 and len(list4) == 0:
+        bool_1 = messagebox.askyesno('Tips','所有人都已经被点过，点击“是”将删除记录并重新开始，请确认相关数据是否已备份。')
         if bool_1 == True:
             reset_nd()
         else:

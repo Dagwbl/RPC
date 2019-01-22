@@ -8,7 +8,7 @@ import tkinter as tk
 from sys import exit
 from tkinter import messagebox, ttk
 from tkinter.filedialog import askdirectory, asksaveasfilename
-
+from random import randint
 import pywintypes
 import win32con
 import os
@@ -22,7 +22,7 @@ import win32api
 window = tk.Tk()
 window.geometry('500x300')
 window.title('课堂点名')
-window.resizable(100, 100)
+window.resizable(10, 10)
 window.configure(bg='#9AC5EA')
 
 l_top = tk.Label(window, text='Less is more', bg='#22459E',
@@ -33,15 +33,12 @@ l_top.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
 
 
 def About_info():
-    messagebox.showinfo('About', '''还是太菜了，感觉代码写的一塌糊涂，非常感谢袁老师给的锻炼机会，不然一直不会写出一个完整的程序来。\n\
-    使用说明也不想写啦，毕竟就那么一个功能。此程序已在\nGitHub（https://github.com/Dagwbl/Python_Study.git）\n开源，欢迎fork并告知，学无止境\n 
-    第一次使用如未配置文件，默认为安全161班学生，单击‘Roll Call’即可开始随机点名。全班学生会在窗口左侧呈现列表，已经被点过名的会在窗口左侧呈现。\n
-    菜单栏分别对应着\n
-    配置文件，查询信息，增删信息，关于\n
-    英语太差，凭直觉理解
-    哦，对了，千万别打开程序目录的CSV文件，否则会造成程序异常。\
-    \
-    早
+    messagebox.showinfo('About', '''\n\
+    Nothing is true.\n\
+    \n\
+    GitHub:\n\
+    https://github.com/Dagwbl/RPC.git\n
+    
     ''')
 
 def printfile():
@@ -64,8 +61,8 @@ def score(stu_info):
         info = stu_info
         with open(listfile3,'a+',encoding = 'utf-8',newline = '') as lf3:
             writer = csv.writer(lf3)
-            writer.writerow([info[0],info[1],str(score_ed)])
-            list3.append([info[0],info[1],str(score_ed)])
+            writer.writerow([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
+            list3.append([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
             list3s.set(list3[::-1])
             _list3.pack()
             score_window.destroy()
@@ -83,6 +80,7 @@ def score(stu_info):
 
 def yes_or_no(stu_info):
     # stu_id = stu_info[0]
+    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
     info = stu_info
     tit = str(info[1]) + '请回答'
     ques = str(info[1]) + " 回答出问题来了吗？"
@@ -96,24 +94,69 @@ def yes_or_no(stu_info):
             writer.writerow(info)
             list4.append(info)
             list4s.set(list4[::-1])
+            print(list4)
             _list4.pack()
 
-def name():
-    # l_top.config(text='Click button Start random roll call')
-    f.Named()
-    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
-    l_top.config(text=list2[-1])
-    yes_or_no(list2[-1])
-    
-    l_bottom.config(text='Surplus: '+str(surplus))
-    # if flag == False:
-    list1s.set(list1)
-    list2s.set(list2[::-1])
-    _list2.pack()
-    _list1.pack()
-    # l_top.config(text=list2[-1])
+def delaytime():
+
+    l_top.config(text = '随机点名中')
     l_top.pack()
 
+
+def name():
+    # window.after(0,delaytime)
+    # # window.after(3000,f.Named)
+    # time.sleep(3)
+    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    if surplus ==0 and len(list4)!=0:
+        messagebox.showinfo('提示','所有学生已经点完，且尚有回答错误的同学，请开始第二轮点名，将从回答错误的列表中抽取。如需强制忽略，可从菜单》文件》重置即可')
+    elif surplus ==0 and len(list4)==0:
+        messagebox.showinfo('提示','所有学生已经点完，请备份好数据并重置')
+    else:
+        f.Named()
+        list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+        l_top.config(text=list2[-1])
+        yes_or_no(list2[-1])
+        
+        l_bottom.config(text='Surplus: '+str(surplus))
+        # if flag == False:
+        list1s.set(list1)
+        list2s.set(list2[::-1])
+        _list2.pack()
+        _list1.pack()
+        # l_top.config(text=list2[-1])
+        l_top.pack()
+def name2():
+    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    # print(counter1,counter2,surplus)
+    # print(list2)
+    if len(list4) == 0:
+        messagebox.showinfo('Tips','尚未没有回答错误的学生，请先开始第一轮点名！')
+        # if bool_1 == True:
+        #     reset_nd()
+        # else:
+        #     pass
+    else:
+        flag = True
+        while flag:
+            limite = len(list4)-1
+            lucky = randint(0,limite)
+            lucky_person = list4[lucky]
+            # print(lucky)
+            # print(lucky_person)
+            ids = [row[0] for row in list3]
+            if  lucky_person[0] not in ids:
+                list4.remove(lucky_person)
+                with open(listfile4,'w',encoding = 'utf-8',newline ='') as lf4:
+                    writer = csv.writer(lf4)
+                    writer.writerows(list4)
+                # list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+                list4s.set(list4[::-1])
+                _list4.pack()
+                yes_or_no(lucky_person)
+                flag = False
+            else:
+                continue
 
 def Uncall_person():
     list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
@@ -123,7 +166,7 @@ def Uncall_person():
             continue
         else:
             list0.append(row)
-    str0 = 'All uncalled students are :\n'+str(list0)
+    str0 = '还没有被点到的人 :\n'+str(list0)
     messagebox.showinfo('Uncall list', str0)
 
 def add_student():
@@ -133,7 +176,7 @@ def add_student():
         stu_info = [Student_id, nn]
         list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
         if stu_info in list1:
-            messagebox.showerror('Error', 'The user is already exist!')
+            messagebox.showerror('Error', '学生信息已存在!')
         else:
             with open(listfile1, 'a', encoding='utf-8', newline='') as class_list:
                 # pickle.dump(exist_usr_info, class_list)
@@ -173,11 +216,11 @@ def del_studental():
         stu_info = [Student_id,nn]
         list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
         if stu_info not in list1:
-            messagebox.showerror('Error', "The user isn't exist!")
+            messagebox.showerror('Error', "学生信息不存在!")
         else:
-            with open(listfile1, 'w',encoding = 'utf-8',newline = '') as class_list:
+            with open(listfile1, 'w',encoding = 'utf-8',newline = '') as lf1:
                 list1.remove(stu_info)
-                writer01 = csv.writer(class_list)
+                writer01 = csv.writer(lf1)
                 for row in list1:
                     writer01.writerow(row)
                 list1s.set(list1)
@@ -186,7 +229,7 @@ def del_studental():
                 _list1.place( )
                 l_bottom.config(text =  'Surplus: '+str(surplus-1))
                 l_bottom.pack(side = 'bottom')
-                messagebox.showinfo('Tips', 'You have successfully delete!')
+                messagebox.showinfo('Tips', '已成功删除!')
                 add_window.destroy()
     add_window = tk.Toplevel(window)
     add_window.geometry('350x200')
@@ -210,7 +253,7 @@ def add_studented():
         stu_info = [Student_id,nn]
         list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
         if stu_info not in list1:
-            messagebox.showerror('Error', "The user isn't exist!")
+            messagebox.showerror('Error', "学生信息不存在!")
         else:
             with open(listfile2, 'a',encoding = 'utf-8',newline='') as class_list:
                 writer = csv.writer(class_list)
@@ -257,8 +300,9 @@ def del_score(stu_info):
                 reader = csv.reader(lf3)
                 list0 =[]
                 for row in reader:
-                    if info[0] !=row[0]:pass
-                    else : list0.append(row)
+                    if info[0] !=row[0]:
+                        list0.append(row)
+                    else : pass
             with open(listfile3,'w',encoding = 'utf-8',newline = '') as lf3:
                 writer = csv.writer(lf3)
                 # for row in list0:
@@ -327,14 +371,18 @@ page2 = tk.Frame(page)
 pagemid.configure(bg='#9AC5EA')
 page1.pack(side='left', expand=tk.YES, fill=tk.Y)
 page2.pack(side='right', expand=tk.YES, fill=tk.Y)
-pagemid.pack(side='bottom', expand=tk.YES, padx=1, ipady=63)
+pagemid.pack(side='bottom', expand=tk.YES, padx=1, ipady=50)
 page.pack(side='top')
 
 tk.Label(pagemid, text="", bg="#9AC5EA", font=(
     "Arial", 12), width=15, height=2).pack(side='top')
 n_button = tk.Button(pagemid, text='点名', width=4,
                     height=1, font=('Times 17 bold'), fg='#FFFFFF', bg='#0895A8', padx=12, command=name)
-n_button.pack(side='bottom')
+n2_button = tk.Button(pagemid, text='二轮点名', width=6,
+height=1, font=('Times 11 normal'), fg='#FFFFFF', bg='#6c8cd5', command=name2)
+n2_button.pack(side = 'bottom',fill = tk.X,pady = 1)
+n_button.pack(side='bottom',pady = 6)
+
 
 tabControl = ttk.Notebook(page1)
 tab1 = ttk.Frame(tabControl)
@@ -356,7 +404,7 @@ list2s = tk.StringVar()
 # list2.set([1,2])
 list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
 list1s.set(list1)
-list2s.set(list2)
+list2s.set(list2[::-1])
 _list1 = tk.Listbox(tab1, listvariable=list1s)
 _list2 = tk.Listbox(tab2, listvariable=list2s)
 
@@ -376,8 +424,8 @@ _list3.pack()
 _list4.pack()
 
 l_bottom = tk.Label(window, text='', bg='#71C1ED',
-                    fg='#FFFFFF', height=1, font=("Times 12 bold"))
-l_bottom.config(text = "剩余未点人数："+ str(surplus))
+                    fg='#FFFFFF', height=1, font=("Times 9 normal"))
+l_bottom.config(text = "surplus："+ str(surplus))
 l_bottom.pack(side=tk.BOTTOM, expand=tk.YES, fill=tk.X)
 
 menubar = tk.Menu(window)
@@ -395,7 +443,7 @@ printmenu.add_command(label = '打印到文件',command = printfile)
 
 inquiremenu = tk.Menu(menubar, tearoff=0)
 menubar.add_cascade(label='查询', menu=inquiremenu)
-inquiremenu.add_command(label='未点人数', command=Uncall_person)
+inquiremenu.add_command(label='未点名单', command=Uncall_person)
 inquiremenu.add_command(label='班级人数', command=f.students_num)
 inquiremenu.add_command(label='剩余人数', command=f.surplus_num)
 
