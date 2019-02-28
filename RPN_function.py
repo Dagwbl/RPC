@@ -15,13 +15,14 @@ listfile3 = 'list3.csv'
 listfile4 = 'list4.csv'
 
 def reset_nd():
-    jud = messagebox.askyesno('Warning','将删除所有相关记录文件， 此操作不可逆，是否继续？')
+    jud = messagebox.askyesno('Warning','将删除所有相关记录文件， 此操作不可逆，是否继续？\n\n\
+    （重置后需关闭程序并重新启动）')
     if jud:
         try:os.remove(listfile1)
         except FileNotFoundError:pass
         try:os.remove(listfile2)
         except FileNotFoundError:pass
-        os.remove(listfile2)
+        # os.remove(listfile2)
         try:os.remove(listfile3)
         except FileNotFoundError:pass
         try:os.remove(listfile4)

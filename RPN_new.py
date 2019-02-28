@@ -11,6 +11,7 @@ from tkinter.filedialog import askdirectory, asksaveasfilename
 from random import randint
 import pywintypes
 import win32con
+from count_time import StopWatch
 import os
 
 import RPN_function as f
@@ -22,7 +23,7 @@ import win32api
 window = tk.Tk()
 window.geometry('500x300')
 window.title('课堂提问')
-window.resizable(1, 0)
+window.resizable(1, 1)
 window.configure(bg='#9AC5EA')
 
 l_top = tk.Label(window, text='Less is more', bg='#22459E',
@@ -30,7 +31,7 @@ l_top = tk.Label(window, text='Less is more', bg='#22459E',
 l_top.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
 
 
-
+"""  """
 
 def About_info():
     messagebox.showinfo('About', '''\n\
@@ -40,6 +41,12 @@ def About_info():
     https://github.com/Dagwbl/RPC.git\n
     
     ''')
+
+def combine_funcs(*funcs):
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+    return combined_func
 
 def printfile():
             # defining options for opening a directory  
@@ -59,24 +66,39 @@ def score(stu_info):
     def write_score():
         score_ed = score_num.get()
         info = stu_info
-        with open(listfile3,'a+',encoding = 'utf-8',newline = '') as lf3:
-            writer = csv.writer(lf3)
-            writer.writerow([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
-            list3.append([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
-            list3s.set(list3[::-1])
-            _list3.pack()
+        if score_ed:
+            with open(listfile3,'a+',encoding = 'utf-8',newline = '') as lf3:
+                writer = csv.writer(lf3)
+                writer.writerow([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
+                list3.append([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
+                list3s.set(list3[::-1])
+                _list3.pack()
+                score_window.destroy()
+        else :
+            with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
+                writer = csv.writer(lf4)
+                # reader = csv.reader(lf4)
+                writer.writerow(info)
+                list4.append(info)
+                list4s.set(list4[::-1])
+                print(list4)
+                _list4.pack()
             score_window.destroy()
     score_window = tk.Toplevel(window)
     score_window.title('请评分')
     score_window.geometry('300x200')
+    score_window.wm_attributes('-topmost',1)
     score_num = tk.IntVar()
     score_num.set(100)
     tk.Label(score_window, text='请输入分数:').grid(column =0,row = 0,rowspan = 2,pady = 40)
     entry_score = tk.Entry(score_window,textvariable = score_num)
     entry_score.grid(row = 0,column = 1,rowspan = 2,pady =40)
-
     en_button = tk.Button(score_window,text = '确认',command = write_score)
     en_button.grid(row =3,column = 1,sticky= tk.EW)
+    def callback():
+        messagebox.showwarning('提示','请输入分数')
+    score_window.protocol("WM_DELETE_WINDOW", callback)
+
 
 def yes_or_no(stu_info):
     # stu_id = stu_info[0]
@@ -86,8 +108,13 @@ def yes_or_no(stu_info):
     ques = str(info[1]) + " 回答出问题来了吗？"
     sta = messagebox.askyesno(tit,ques)
     if sta:
+        sw.Stop()
+        # sw.Reset()
         score(stu_info)
+
     else:
+        sw.Stop()
+        # sw.Reset()
         with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
             writer = csv.writer(lf4)
             # reader = csv.reader(lf4)
@@ -147,6 +174,8 @@ def name2():
             ids = [row[0] for row in list3]
             if  lucky_person[0] not in ids:
                 list4.remove(lucky_person)
+                flag = False
+                os.remove(listfile4)
                 with open(listfile4,'w',encoding = 'utf-8',newline ='') as lf4:
                     writer = csv.writer(lf4)
                     writer.writerows(list4)
@@ -289,7 +318,8 @@ def del_score(stu_info):
         info = stu_info
         if info in list4:
             list4.remove(info)
-            with open(listfile4,'w',encoding = 'utf-8',newline='')as lf4:
+            # os.remove(listfile4)
+            with open(listfile4,'w+',encoding = 'utf-8',newline='')as lf4:
                 writer = csv.writer(lf4)
                 writer.writerows(list4)
                 list4s.set(list4)
@@ -303,6 +333,7 @@ def del_score(stu_info):
                     if info[0] !=row[0]:
                         list0.append(row)
                     else : pass
+            os.remove(listfile3)
             with open(listfile3,'w',encoding = 'utf-8',newline = '') as lf3:
                 writer = csv.writer(lf3)
                 # for row in list0:
@@ -316,10 +347,8 @@ def del_student_from_ed():
         Student_id = stu_id.get()
         nn = stu_name.get()
         stu_info = [Student_id,nn]
-        list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
-        if stu_info not in list2:
-            messagebox.showerror('Error', "学生信息不存在!")
-        else:
+        _,list2,*_,surplus = f.inquire_ed()
+        if stu_info  in list2:
             list2.remove(stu_info)
             os.remove(listfile2)
             with open(listfile2, 'w',encoding = 'utf-8',newline='') as lf2:
@@ -335,6 +364,10 @@ def del_student_from_ed():
             l_bottom.config(text =  'Surplus: '+str(surplus+1))
             l_bottom.pack(side = 'bottom')
             add_window.destroy()
+        else :
+            messagebox.showerror('Error', "学生信息不存在!")
+            
+
     add_window = tk.Toplevel(window)
     add_window.geometry('350x200')
     add_window.title('Delete student from called list')
@@ -365,24 +398,31 @@ page1 = tk.Frame(page)
 pagemid = tk.Frame(page)
 page2 = tk.Frame(page)
 
-# tk.Label(page1, text="左页", bg="yellow", font=("Arial", 12), width=10, height=2).pack(side='top')
-# tk.Label(pagemid, text="", bg="green", font=("Arial", 12), width=10, height=2).pack(side='top')
-# tk.Label(page2, text="右页", bg="red", font=("Arial", 12), width=10, height=2).pack(side='top')
 pagemid.configure(bg='#9AC5EA')
 page1.pack(side='left', expand=tk.YES, fill=tk.Y)
 page2.pack(side='right', expand=tk.YES, fill=tk.Y)
-pagemid.pack(side='bottom', expand=tk.YES, padx=1, ipady=41)
+pagemid.pack(side='bottom', expand=tk.YES, padx=1,fill = tk.Y)
 page.pack(side='top')
 
-tk.Label(pagemid, text="", bg="#9AC5EA", font=(
-    "Arial", 12), width=15, height=2).pack(side='top')
-n_button = tk.Button(pagemid, text='提问', width=4,
-                    height=1, font=('Times 17 bold'), fg='#FFFFFF', bg='#0895A8', padx=12, command=name)
-n2_button = tk.Button(pagemid, text='补充提问', width=6,
-height=1, font=('Times 11 normal'), fg='#FFFFFF', bg='#6c8cd5', command=name2)
-n2_button.pack(side = 'bottom',fill = tk.X,pady = 1)
-n_button.pack(side='bottom',pady = 6)
+pagemid1 = tk.Frame(pagemid)
+pagemid1.pack()
+pagemid2 =tk.Frame(pagemid,bg="#9AC5EA")
+pagemid2.pack()
+sw = StopWatch(pagemid1)
+sw.pack(side = 'top')
+tk.Button(pagemid1,text='Start',command=sw.Start).pack(side=tk.LEFT,anchor = 'nw',pady = 0)
+tk.Button(pagemid1,text='Stop',command=sw.Stop).pack(side=tk.LEFT,anchor = 'n',pady = 0)
+tk.Button(pagemid1,text='Reset',command=sw.Reset).pack(side=tk.LEFT,anchor = 'ne',pady =0)
+# tk.Button(pagemid,text='Quit',command=sw.quit).pack(side=tk.LEFT)
 
+tk.Label(pagemid2, text="", bg="#9AC5EA", font=(
+    "Arial", 12),height = 3).pack(side='top')
+n_button = tk.Button(pagemid2, text='提问', width=4,
+                    height=1, font=('Times 17 bold'), fg='#FFFFFF', bg='#0895A8', padx=12, command=combine_funcs(sw.Reset,sw.Start,name))
+n2_button = tk.Button(pagemid2, text='补充提问', width=6,
+height=1, font=('Times 11 normal'), fg='#FFFFFF', bg='#6c8cd5', command=combine_funcs(sw.Reset,sw.Start,name2))
+n2_button.pack(side = tk.BOTTOM,fill = tk.X,pady = 6,anchor = 'n')
+n_button.pack(side=tk.BOTTOM,fill = tk.X,pady = 6)
 
 tabControl = ttk.Notebook(page1)
 tab1 = ttk.Frame(tabControl)
@@ -424,15 +464,24 @@ _list3.pack()
 _list4.pack()
 
 l_bottom = tk.Label(window, text='', bg='#71C1ED',
-                    fg='#FFFFFF', height=1, font=("Times 9 normal"))
+                    fg='#FFFFFF', height=1, font=("Times 12 bold"))
 l_bottom.config(text = "surplus："+ str(surplus))
 l_bottom.pack(side=tk.BOTTOM, expand=tk.YES, fill=tk.X)
-
+# def modifiy(n):
+#     # CommandString = 'start notepad list' + str(n) +'.csv' 
+#     fileName = 'list' + str(n) + '.csv'
+#     win32api.ShellExecute(0, 'open', 'notepad.exe', fileName,'',1)
 menubar = tk.Menu(window)
 filemenu = tk.Menu(menubar, tearoff=0)
+# submenu = tk.Menu(filemenu,tearoff=0)
 menubar.add_cascade(label='文件', menu=filemenu)
 filemenu.add_command(label='打开', command=f.chooseFile)
 filemenu.add_command(label='重置', command=f.reset_nd)
+# filemenu.add_cascade(label = '修改',menu = submenu)
+# submenu.add_command(label = '全部学生',command= modifiy(1))
+# submenu.add_command(label = '已点学生',command= modifiy(2))
+# submenu.add_command(label = '回答正确',command= modifiy(3))
+# submenu.add_command(label = '回答错误',command= modifiy(4))
 filemenu.add_separator()
 filemenu.add_command(label='退出', command=window.quit)
 
@@ -440,7 +489,6 @@ printmenu = tk.Menu(menubar,tearoff = 0)
 menubar.add_cascade(label = '打印',menu = printmenu)
 printmenu.add_command(label = '打印成绩',command = print_score)
 printmenu.add_command(label = '打印到文件',command = printfile)
-
 inquiremenu = tk.Menu(menubar, tearoff=0)
 menubar.add_cascade(label='查询', menu=inquiremenu)
 inquiremenu.add_command(label='未点名单', command=Uncall_person)
