@@ -1,5 +1,7 @@
-import tkinter as tk
 import time
+import tkinter as tk
+from tkinter import messagebox
+
 class StopWatch(tk.Frame):
     '''实现一个秒表部件'''
     msec=50
@@ -10,6 +12,7 @@ class StopWatch(tk.Frame):
         self._running = False
         self.timestr = tk.StringVar()
         self.makeWidgets()
+        self.minuteTips = 0
     def makeWidgets(self):
         '''制作时间标签'''
         l = tk.Label(self,textvariable=self.timestr,font=("Times 12 bold"))
@@ -26,6 +29,19 @@ class StopWatch(tk.Frame):
         seconds = int(elap-minutes*60.0)
         hseconds = int((elap-minutes*60.0-seconds)*100)
         self.timestr.set('%02d:%02d:%02d'%(minutes,seconds,hseconds))
+        if not minutes%5 and minutes!=0 and self.minuteTips!=minutes:
+            # # CountTips = minutes/5
+            # TipsWindow = tk.Tk()
+            # TipsWindow.title('提示')
+            # TipsWindow.geometry('200*100')
+            # # TipsLabel = tk.Label(TipsWindow,text = str(minutes) + '分钟已经到了！')
+            # TipsLabel = tk.Label(TipsWindow,text ='分钟已经到了！',fg= 'red')
+            # TipsLabel.pack()
+            # TipsWindow.destroy()
+            messagebox.showinfo('Tips',str(minutes) + '分钟已经到了！')
+            self.minuteTips = minutes
+
+
     def Start(self):
         '''开始秒表'''
         if not self._running:
@@ -46,7 +62,6 @@ class StopWatch(tk.Frame):
         self._setTime(self._elapsedtime)
 if __name__ =='__main__':
     def main():
-        import tkinter
         root =tk.Tk()
         sw =StopWatch()
         sw.pack(side=tk.TOP)

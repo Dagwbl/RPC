@@ -102,7 +102,7 @@ def score(stu_info):
 
 def yes_or_no(stu_info):
     # stu_id = stu_info[0]
-    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    _,_,_,list4,*_ = f.inquire_ed()
     info = stu_info
     tit = str(info[1]) + '请回答'
     ques = str(info[1]) + " 回答出问题来了吗？"
@@ -124,24 +124,18 @@ def yes_or_no(stu_info):
             print(list4)
             _list4.pack()
 
-def delaytime():
-
-    l_top.config(text = '随机点名中')
-    l_top.pack()
-
-
 def name():
     # window.after(0,delaytime)
     # # window.after(3000,f.Named)
     # time.sleep(3)
-    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    list1,list2,_,list4,*_,surplus = f.inquire_ed()
     if surplus ==0 and len(list4)!=0:
         messagebox.showinfo('提示','所有学生已经点完，且尚有回答错误的同学，请开始第二轮提问，将从回答错误的列表中抽取。如需强制忽略，可从菜单》文件》重置即可')
     elif surplus ==0 and len(list4)==0:
         messagebox.showinfo('提示','所有学生已经点完，请备份好数据并重置')
     else:
         f.Named()
-        list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+        list1,list2,_,list4,*_,surplus = f.inquire_ed()
         l_top.config(text=list2[-1])
         yes_or_no(list2[-1])
         
@@ -154,7 +148,7 @@ def name():
         # l_top.config(text=list2[-1])
         l_top.pack()
 def name2():
-    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    _,_,list3,list4,*_ = f.inquire_ed()
     # print(counter1,counter2,surplus)
     # print(list2)
     if len(list4) == 0:
@@ -182,13 +176,14 @@ def name2():
                 # list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
                 list4s.set(list4[::-1])
                 _list4.pack()
+                l_top.config(text=lucky_person)
                 yes_or_no(lucky_person)
                 flag = False
             else:
                 continue
 
 def Uncall_person():
-    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    list1,list2,*_ = f.inquire_ed()
     list0 = []
     for row in list1:
         if row in list2:
@@ -203,7 +198,7 @@ def add_student():
         Student_id = stu_id.get()
         nn = stu_name.get()
         stu_info = [Student_id, nn]
-        list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+        list1,list2,*_,surplus = f.inquire_ed()
         if stu_info in list1:
             messagebox.showerror('Error', '学生信息已存在!')
         else:
@@ -243,7 +238,7 @@ def del_studental():
         Student_id = stu_id.get()
         nn = stu_name.get()
         stu_info = [Student_id,nn]
-        list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+        list1,list2,*_,surplus = f.inquire_ed()
         if stu_info not in list1:
             messagebox.showerror('Error', "学生信息不存在!")
         else:
@@ -280,7 +275,7 @@ def add_studented():
         Student_id = stu_id.get()
         nn = stu_name.get()
         stu_info = [Student_id,nn]
-        list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+        list1,list2,*_,surplus = f.inquire_ed()
         if stu_info not in list1:
             messagebox.showerror('Error', "学生信息不存在!")
         else:
@@ -385,7 +380,7 @@ def del_student_from_ed():
     btn_comfirm_sign_up.place(x=150, y=130)
 
 def print_score():
-    list1,list2,list3,list4,counter1,counter2,surplus = f.inquire_ed()
+    _,_,list3,*_ = f.inquire_ed()
     messagebox.showinfo('成绩',sorted(list3))
 
 listfile1 = 'list1.csv'
