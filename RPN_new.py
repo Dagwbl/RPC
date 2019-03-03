@@ -62,19 +62,48 @@ def printfile():
         except FileNotFoundError:
             messagebox.showinfo('提示','还没有成绩信息')
 
-def score(stu_info):
-    def write_score():
-        score_ed = score_num.get()
-        info = stu_info
-        if score_ed:
-            with open(listfile3,'a+',encoding = 'utf-8',newline = '') as lf3:
-                writer = csv.writer(lf3)
-                writer.writerow([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
-                list3.append([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
-                list3s.set(list3[::-1])
-                _list3.pack()
-                score_window.destroy()
-        else :
+# def score(stu_info):
+#     info = stu_info
+#     def WriteFile():
+#         score_ed = var1.get()
+#         if score_ed:
+            # with open(listfile3,'a+',encoding = 'utf-8',newline = '') as lf3:
+            #     writer = csv.writer(lf3)
+            #     writer.writerow([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
+            #     list3.append([info[0],info[1],str(score_ed),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))])
+            #     list3s.set(list3[::-1])
+            #     _list3.pack()
+#                 # score_window.destroy()
+#         else :
+#             with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
+#                 writer = csv.writer(lf4)
+#                 # reader = csv.reader(lf4)
+#                 writer.writerow(info)
+#                 list4.append(info)
+#                 list4s.set(list4[::-1])
+#                 print(list4)
+#                 _list4.pack()
+    #         score_window.destroy()
+    # score_window = tk.Toplevel(window)
+    # score_window.title('请评分')
+    # score_window.geometry('300x200')
+    # score_window.wm_attributes('-topmost',1)
+    # score_num = tk.IntVar()
+    # score_num.set(100)
+    # tk.Label(score_window, text='请输入分数:').grid(column =0,row = 0,rowspan = 2,pady = 40)
+    # entry_score = tk.Entry(score_window,textvariable = score_num)
+    # entry_score.grid(row = 0,column = 1,rowspan = 2,pady =40)
+    # en_button = tk.Button(score_window,text = '确认',command = write_score)
+    # en_button.grid(row =3,column = 1,sticky= tk.EW)
+    # def callback():
+    #     messagebox.showwarning('提示','请输入分数')
+    # score_window.protocol("WM_DELETE_WINDOW", callback)
+
+
+def yes_or_no(stu_info):
+    info = stu_info
+    def WriteFile():
+        if var1.get() == 0:
             with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
                 writer = csv.writer(lf4)
                 # reader = csv.reader(lf4)
@@ -83,46 +112,74 @@ def score(stu_info):
                 list4s.set(list4[::-1])
                 print(list4)
                 _list4.pack()
-            score_window.destroy()
-    score_window = tk.Toplevel(window)
-    score_window.title('请评分')
-    score_window.geometry('300x200')
-    score_window.wm_attributes('-topmost',1)
-    score_num = tk.IntVar()
-    score_num.set(100)
-    tk.Label(score_window, text='请输入分数:').grid(column =0,row = 0,rowspan = 2,pady = 40)
-    entry_score = tk.Entry(score_window,textvariable = score_num)
-    entry_score.grid(row = 0,column = 1,rowspan = 2,pady =40)
-    en_button = tk.Button(score_window,text = '确认',command = write_score)
-    en_button.grid(row =3,column = 1,sticky= tk.EW)
+        else:
+            with open(listfile3,'a+',encoding = 'utf-8',newline = '') as lf3:
+                writer = csv.writer(lf3)
+                writer.writerow([info[0],info[1],str(var1.get()),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),var2.get()])
+                list3.append([info[0],info[1],str(var1.get()),str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),var2.get()])
+                list3s.set(list3[::-1])
+                _list3.pack()
+        AskWindow.destroy()
+    def Setlimit():
+        swa._limittime = t_limit.get()
+        swa.Start()
+        # pass
+    AskWindow = tk.Toplevel(window)
+    AskWindow.title(str(info[1]) + '准备回答')
+    # AskWindow.resizable(0,0)
+    AskWindow.geometry('280x400')
+    # Button0 = tk.Button(AskWindow,text)
+    t_label = tk.Label(AskWindow,text = '回答时间限制：')
+    t_label.grid(column = 0,row = 1)
+    t_limit = tk.IntVar()
+    t_limit.set(5)
+    t_limit_label = tk.Entry(AskWindow,textvariable = t_limit)
+    t_limit_label.grid(column = 0, row = 2)
+    swa = StopWatch(AskWindow)
+    swa.grid(row = 0,column = 0)
+    StButton = tk.Button(AskWindow,text = '开始计时',command = Setlimit)
+    StButton.grid(row = 3,column = 0,pady = 6)
+    label2 = tk.Label(AskWindow,text = '请输入评分：')
+    label2.grid(row = 4,column = 0)
+    var1 =tk.IntVar()
+    ScoreEntry = tk.Entry(AskWindow,textvariable = var1)
+    var1.set(100)
+    ScoreEntry.grid(row = 5,column = 0)
+    label3 = tk.Label(AskWindow,text = '(提示：0分将加入回答错误列表，供补充提问使用)')
+    label3.grid(row = 6,column = 0)
+    label4 = tk.Label(AskWindow,text = '备注:')
+    label4.grid(row = 7,column = 0,rowspan = 2)
+    var2 = tk.StringVar()
+    RemarkEntry = tk.Entry(AskWindow,textvariable = var2)
+    RemarkEntry.grid(row = 10,column = 0,rowspan = 2)
+    CompleteButton = tk.Button(AskWindow,text = '完成',command = WriteFile,font = ('Times 12 bold'))
+    CompleteButton.grid(row = 12, column = 0,pady = 12)
     def callback():
-        messagebox.showwarning('提示','请输入分数')
-    score_window.protocol("WM_DELETE_WINDOW", callback)
+        messagebox.showwarning('提示','请给出分数后点击完成退出')
+    AskWindow.protocol("WM_DELETE_WINDOW", callback)
 
-
-def yes_or_no(stu_info):
     # stu_id = stu_info[0]
-    _,_,_,list4,*_ = f.inquire_ed()
+    # _,_,_,list4,*_ = f.inquire_ed()
     info = stu_info
-    tit = str(info[1]) + '请回答'
-    ques = str(info[1]) + " 回答出问题来了吗？"
-    sta = messagebox.askyesno(tit,ques)
-    if sta:
-        sw.Stop()
-        # sw.Reset()
-        score(stu_info)
+    # tit = str(info[1]) + '请回答'
+    # ques = str(info[1]) + " 回答出问题来了吗？"
+    # sta = messagebox.askyesno(tit,ques)
+    # if sta:
+    #     sw.Stop()
+    #     # sw.Reset()
+    #     score(stu_info)
 
-    else:
-        sw.Stop()
-        # sw.Reset()
-        with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
-            writer = csv.writer(lf4)
-            # reader = csv.reader(lf4)
-            writer.writerow(info)
-            list4.append(info)
-            list4s.set(list4[::-1])
-            print(list4)
-            _list4.pack()
+    # else:
+    #     sw.Stop()
+    # #     # sw.Reset()
+    #     with open(listfile4,'a+',encoding = 'utf-8',newline = '') as lf4:
+    #         writer = csv.writer(lf4)
+    #         # reader = csv.reader(lf4)
+    #         writer.writerow(info)
+    #         list4.append(info)
+    #         list4s.set(list4[::-1])
+    #         print(list4)
+    #         _list4.pack()
 
 def name():
     # window.after(0,delaytime)
@@ -413,9 +470,9 @@ tk.Button(pagemid1,text='Reset',command=sw.Reset).pack(side=tk.LEFT,anchor = 'ne
 tk.Label(pagemid2, text="", bg="#9AC5EA", font=(
     "Arial", 12),height = 3).pack(side='top')
 n_button = tk.Button(pagemid2, text='提问', width=4,
-                    height=1, font=('Times 17 bold'), fg='#FFFFFF', bg='#0895A8', padx=12, command=combine_funcs(sw.Reset,sw.Start,name))
+                    height=1, font=('Times 17 bold'), fg='#FFFFFF', bg='#0895A8', padx=12, command=combine_funcs(name))
 n2_button = tk.Button(pagemid2, text='补充提问', width=6,
-height=1, font=('Times 11 normal'), fg='#FFFFFF', bg='#6c8cd5', command=combine_funcs(sw.Reset,sw.Start,name2))
+height=1, font=('Times 11 normal'), fg='#FFFFFF', bg='#6c8cd5', command=combine_funcs(name2))
 n2_button.pack(side = tk.BOTTOM,fill = tk.X,pady = 6,anchor = 'n')
 n_button.pack(side=tk.BOTTOM,fill = tk.X,pady = 6)
 
