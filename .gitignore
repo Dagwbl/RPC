@@ -7,3 +7,4 @@ list2.csv
 list3.csv
 list4.csv
 __pycache__/RPN_new.cpython-37.pyc
+*.pyc
